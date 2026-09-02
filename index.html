@@ -42,16 +42,16 @@
       padding: 0 16px;
     }
 
-  .card {
-  background: white;
-  border-radius: 14px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.10);
-  overflow: hidden;
-  min-height: 700px;
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.10);
+      overflow: hidden;
+      min-height: 700px;
     }
 
     .loader {
-      min-height: 430px;
+      min-height: 700px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -74,12 +74,12 @@
       }
     }
 
-  iframe {
-  width: 100%;
-  height: 700px;
-  border: 0;
-  display: block;
-  overflow: hidden;
+    iframe {
+      width: 100%;
+      height: 700px;
+      border: 0;
+      display: block;
+      overflow: hidden;
     }
 
     .error {
@@ -119,6 +119,7 @@
       <iframe
         id="verificationFrame"
         title="Risultato verifica attestato"
+        scrolling="no"
       ></iframe>
 
       <div class="error" id="error">
@@ -142,6 +143,7 @@
 
     const params = new URLSearchParams(window.location.search);
 
+    const id = params.get("id");
     const protocollo = params.get("protocollo");
     const discente = params.get("discente");
 
@@ -149,18 +151,34 @@
     const loader = document.getElementById("loader");
     const errorBox = document.getElementById("error");
 
-    if (!protocollo || !discente) {
-      loader.style.display = "none";
-      frame.style.display = "none";
-      errorBox.style.display = "block";
-    } else {
-      const verificationUrl =
+    let verificationUrl = "";
+
+    // NUOVO SISTEMA CON ID UNIVOCO
+    if (id) {
+      verificationUrl =
+        APPS_SCRIPT_URL +
+        "?id=" +
+        encodeURIComponent(id);
+    }
+
+    // VECCHIO SISTEMA, mantenuto per compatibilità
+    else if (protocollo && discente) {
+      verificationUrl =
         APPS_SCRIPT_URL +
         "?protocollo=" +
         encodeURIComponent(protocollo) +
         "&discente=" +
         encodeURIComponent(discente);
+    }
 
+    // NESSUN PARAMETRO VALIDO
+    else {
+      loader.style.display = "none";
+      frame.style.display = "none";
+      errorBox.style.display = "block";
+    }
+
+    if (verificationUrl) {
       frame.src = verificationUrl;
 
       frame.addEventListener("load", function () {
