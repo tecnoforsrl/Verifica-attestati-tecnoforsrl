@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Verifica attestato</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f5f7;
+      color: #1f2937;
+    }
+
+    .header {
+      background: #17212b;
+      color: white;
+      text-align: center;
+      padding: 24px 16px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    .main {
+      max-width: 760px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.10);
+      overflow: hidden;
+      min-height: 430px;
+    }
+
+    .loader {
+      min-height: 430px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #17212b;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    iframe {
+      width: 100%;
+      min-height: 430px;
+      border: 0;
+      display: block;
+    }
+
+    .error {
+      display: none;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .error h2 {
+      color: #b42318;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 12px;
+      color: #667085;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <h1>Verifica attestato</h1>
+    <p>Sistema di verifica digitale degli attestati</p>
+  </header>
+
+  <main class="main">
+    <div class="card">
+
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <div>Verifica in corso...</div>
+      </div>
+
+      <iframe
+        id="verificationFrame"
+        title="Risultato verifica attestato"
+      ></iframe>
+
+      <div class="error" id="error">
+        <h2>Dati mancanti</h2>
+        <p>
+          Il collegamento utilizzato non contiene i dati necessari
+          per verificare l'attestato.
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    Sistema di verifica attestati
+  </footer>
+
+  <script>
+    const APPS_SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbwGUlwtVP4lelW-wjRq0PNdYKTUs_tPWD0n6qs1itduDhprgiYZiWbi3vUsDgA3i9FzPA/exec";
+
+    const params = new URLSearchParams(window.location.search);
+
+    const protocollo = params.get("protocollo");
+    const discente = params.get("discente");
+
+    const frame = document.getElementById("verificationFrame");
+    const loader = document.getElementById("loader");
+    const errorBox = document.getElementById("error");
+
+    if (!protocollo || !discente) {
+      loader.style.display = "none";
+      frame.style.display = "none";
+      errorBox.style.display = "block";
+    } else {
+      const verificationUrl =
+        APPS_SCRIPT_URL +
+        "?protocollo=" +
+        encodeURIComponent(protocollo) +
+        "&discente=" +
+        encodeURIComponent(discente);
+
+      frame.src = verificationUrl;
+
+      frame.addEventListener("load", function () {
+        loader.style.display = "none";
+      });
+    }
+  </script>
+
+</body>
+</html>
